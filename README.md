@@ -1,0 +1,1 @@
+# admin-front-news-service

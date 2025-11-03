@@ -5,9 +5,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard';
-import NewsList from './pages/NewsList';
-import NewsCreate from './pages/NewsCreate';
-import NewsEdit from './pages/NewsEdit';
+import NewsList from './pages/news/NewsList';
+import NewsCreate from './pages/news/NewsCreate';
+import NewsEdit from './pages/news/NewsEdit';
 import Login from './pages/Login';
 
 const theme = createTheme({

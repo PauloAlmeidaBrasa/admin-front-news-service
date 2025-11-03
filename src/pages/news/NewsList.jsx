@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Edit, Trash2, Search } from 'lucide-react'
-import { newsAPI } from '../services/api/api-admin'
+import { newsAPI } from '../../services/api/api-admin'
 
 const NewsList = () => {
   const [searchTerm, setSearchTerm] = useState('')

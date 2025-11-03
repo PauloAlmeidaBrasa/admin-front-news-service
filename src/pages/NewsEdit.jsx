@@ -22,7 +22,7 @@ import {
   Update as UpdateIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
-import { newsAPI } from '../services/api';
+import { newsAPI } from '../services/api/api-admin';
 
 const NewsEdit = () => {
   const navigate = useNavigate();

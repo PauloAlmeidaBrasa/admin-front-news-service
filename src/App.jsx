@@ -34,7 +34,7 @@ function App() {
           {isAuthenticated ? (
             <Layout>
               <Routes>
-                {/* <Route path="/" element={<Dashboard />} /> */}
+                <Route path="/" element={<Dashboard />} />
                 <Route path="/news" element={<NewsList />} />
                 <Route path="/news/create" element={<NewsCreate />} />
                 <Route path="/news/edit/:id" element={<NewsEdit />} />

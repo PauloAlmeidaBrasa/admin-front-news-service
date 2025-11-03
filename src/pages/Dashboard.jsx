@@ -12,7 +12,7 @@ import {
   People as PeopleIcon,
 } from '@mui/icons-material';
 import { useQuery } from '@tanstack/react-query';
-import { newsAPI } from '../services/api';
+import { newsAPI } from '../services/api/api-admin';
 
 const StatCard = ({ title, value, icon, color }) => (
   <Card>

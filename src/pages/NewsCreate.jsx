@@ -19,7 +19,7 @@ import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
-import { newsAPI } from '../services/api';
+import { newsAPI } from '../services/api/api-admin';
 
 const NewsCreate = () => {
   const navigate = useNavigate();

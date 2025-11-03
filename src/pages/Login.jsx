@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Card,
@@ -7,14 +7,70 @@ import {
   Button,
   Typography,
   Box,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { Lock as LockIcon } from '@mui/icons-material';
+import { useMutation } from '@tanstack/react-query';
+import { authAPI } from '../services/api/api-admin';
 
 const Login = ({ onLogin }) => {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Implement your authentication logic here
-    onLogin();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState({});
+
+  const loginMutation = useMutation({
+    mutationFn: (credentials) => authAPI.login(credentials),
+    onSuccess: (response) => {
+      // Handle successful login
+      const { token, user } = response.data;
+      
+      // Store token and user data
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Update app state
+      onLogin();
+    },
+    onError: (error) => {
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors);
+      } else if (error.response?.data?.message) {
+        setErrors({ general: error.response.data.message });
+      } else {
+        setErrors({ general: 'Login failed. Please try again.' });
+      }
+    },
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear errors when user types
+    if (errors[name] || errors.general) {
+      setErrors({});
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Basic validation
+    const newErrors = {};
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -39,6 +95,13 @@ const Login = ({ onLogin }) => {
               </Typography>
             </Box>
 
+            {/* Error Alert */}
+            {errors.general && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {errors.general}
+              </Alert>
+            )}
+
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
@@ -49,6 +112,10 @@ const Login = ({ onLogin }) => {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                value={formData.email}
+                onChange={handleChange}
+                error={!!errors.email}
+                helperText={errors.email}
               />
               <TextField
                 margin="normal"
@@ -59,6 +126,10 @@ const Login = ({ onLogin }) => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={formData.password}
+                onChange={handleChange}
+                error={!!errors.password}
+                helperText={errors.password}
               />
               <Button
                 type="submit"
@@ -66,8 +137,14 @@ const Login = ({ onLogin }) => {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 size="large"
+                disabled={loginMutation.isLoading}
+                startIcon={
+                  loginMutation.isLoading ? 
+                  <CircularProgress size={20} /> : 
+                  null
+                }
               >
-                Sign In
+                {loginMutation.isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </Box>
           </CardContent>

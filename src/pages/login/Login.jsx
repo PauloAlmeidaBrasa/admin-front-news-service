@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { Lock as LockIcon } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
-import { authAPI } from '../services/api/api-admin';
+import { authAPI } from '../../services/api/api-admin';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -25,6 +25,7 @@ const Login = ({ onLogin }) => {
     mutationFn: (credentials) => authAPI.login(credentials),
     onSuccess: (response) => {
 
+      console.log(response)
       if(response.data.error == "invalid_credentials") {
         setErrors({ general: response.data.message })
         return
@@ -34,7 +35,7 @@ const Login = ({ onLogin }) => {
       const { access_token, user } = response.data;
       
       // Store token and user data
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       
       onLogin();

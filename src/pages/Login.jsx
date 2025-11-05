@@ -24,14 +24,19 @@ const Login = ({ onLogin }) => {
   const loginMutation = useMutation({
     mutationFn: (credentials) => authAPI.login(credentials),
     onSuccess: (response) => {
+
+      if(response.data.error == "invalid_credentials") {
+        setErrors({ general: response.data.message })
+        return
+
+      }
       // Handle successful login
-      const { token, user } = response.data;
+      const { access_token, user } = response.data;
       
       // Store token and user data
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user', JSON.stringify(user));
       
-      // Update app state
       onLogin();
     },
     onError: (error) => {

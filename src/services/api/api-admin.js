@@ -16,7 +16,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  // withCredentials: true
+  withCredentials: true
 });
 
 
@@ -39,8 +39,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Auto logout if 401 response
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
+      // localStorage.removeItem('auth_token');
+      // localStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

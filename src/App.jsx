@@ -8,7 +8,7 @@ import Dashboard from './pages/Dashboard';
 import NewsList from './pages/news/NewsList';
 import NewsCreate from './pages/news/NewsCreate';
 import NewsEdit from './pages/news/NewsEdit';
-import Login from './pages/Login';
+import Login from './pages/login/Login';
 
 const theme = createTheme({
   palette: {

@@ -1,30 +1,32 @@
-// export const newsAPI = {
-//   getAll: () => alert('kjsdnf'),
-//   getById: (id) => api.get(`/news/${id}`),
-//   create: (data) => api.post('/news', data),
-//   update: (id, data) => api.put(`/news/${id}`, data),
-//   delete: (id) => api.delete(`/news/${id}`),
-// };
+
 
 import axios from 'axios';
 import { getApiUrl } from '../Utils/env';
 
 
 const api = axios.create({
-  // baseURL: getApiUrl,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  // withCredentials: true
+  withCredentials: true
 });
+
+// a promise queue to prevent multiple refreshes at once
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function onRefreshed(newToken) {
+  refreshSubscribers.forEach(cb => cb(newToken));
+  refreshSubscribers = [];
+}
 
 
 // Add request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
     // console.log(localStorage.getItem('auth_token'))
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,32 +35,81 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor to handle common errors
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Auto logout if 401 response
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+
+    // only handle 401 once per request
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      // If a refresh is already happening, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshSubscribers.push((token) => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
+      try {
+        const res = await api.get(getApiUrl('refresh'));
+        const newAccessToken = res.data.access_token;
+
+        localStorage.setItem('auth', newAccessToken);
+        api.defaults.headers['Authorization'] = `Bearer ${newAccessToken}`;
+        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+
+        // notify queued requests
+        onRefreshed(newAccessToken);
+        isRefreshing = false;
+
+        // retry the original request
+        return api(originalRequest);
+      } catch (refreshError) {
+        isRefreshing = false;
+        console.error('Token refresh failed:', refreshError);
+        // optionally redirect to login
+        // window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
     }
+
     return Promise.reject(error);
   }
 );
 
-export const authAPI = {
-  login: (credentials) => api.post(getApiUrl('login'), credentials),
-  logout: () => api.post('/api/logout'),
-  // getUser: () => api.get('/api/user'),
+export const newsAPIAuth = {
+  getLogin: async (credentials) => {
+    return await api.post(getApiUrl('login'),credentials,{withCredentials:true})
+  },
 };
 
+
 export const newsAPI = {
-  getAll: () => api.get('/api/news'),
-  getById: (id) => api.get(`/api/news/${id}`),
-  create: (data) => api.post('/api/news', data),
-  update: (id, data) => api.patch(`/api/news/${id}`, data),
-  delete: (id) => api.delete(`/api/news/${id}`),
+  // getLogin: () => api.post(getApiUrl('login')),
+  getLogin: (credentials) => {
+    api.create({withCredentials: true})
+    api.post(getApiUrl('login'),credentials)
+  },
+  // getById: (id) => api.get(`/api/news/${id}`),
+  // create: (data) => api.post('/api/news', data),
+  // update: (id, data) => api.patch(`/api/news/${id}`, data),
+  // delete: (id) => api.delete(`/api/news/${id}`),
+};
+
+
+export const newsAPINews = {
+  getAll: async () => api.get(getApiUrl('news/get-news')),
+  // getById: (id) => api.get(`/api/news/${id}`),
+  // create: (data) => api.post('/api/news', data),
+  // update: (id, data) => api.patch(`/api/news/${id}`, data),
+  // delete: (id) => api.delete(`/api/news/${id}`),
 };
 
 export default api;

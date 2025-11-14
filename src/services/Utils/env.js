@@ -14,3 +14,10 @@ export const getWebsocketUrl = () => {
   const baseUrl = getEnv('VITE_API_BASE_URL').replace('http', 'ws');
   return `${baseUrl}/ws`;
 };
+
+export const getAdminApiUrl = () => {
+  const backendUrl = getEnv('VITE_API_BACKEND_BASE');
+  const backendVersion = getEnv('VITE_API_BACKEND_VERSION');
+  console.log(`${backendUrl}/api/${backendVersion}/`)
+  return `${backendUrl}/api/${backendVersion}/`;
+};

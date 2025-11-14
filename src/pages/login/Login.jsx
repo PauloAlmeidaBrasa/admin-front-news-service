@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState, useContext  } from 'react';
 import {
   Container,
   Card,
@@ -12,9 +12,10 @@ import {
 } from '@mui/material';
 import { Lock as LockIcon } from '@mui/icons-material';
 import { useMutation } from '@tanstack/react-query';
-import { authAPI } from '../../services/api/api-admin';
+import { AuthContext } from '../../context/AuthContext';
 
 const Login = ({ onLogin }) => {
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -22,20 +23,18 @@ const Login = ({ onLogin }) => {
   const [errors, setErrors] = useState({});
 
   const loginMutation = useMutation({
-    mutationFn: (credentials) => authAPI.login(credentials),
+    mutationFn: (credentials) => login(credentials),
     onSuccess: (response) => {
 
-      console.log(response)
       if(response.data.error == "invalid_credentials") {
         setErrors({ general: response.data.message })
         return
-
       }
       // Handle successful login
       const { access_token, user } = response.data;
       
       // Store token and user data
-      localStorage.setItem('auth_token', access_token);
+      localStorage.setItem('auth', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       
       onLogin();

@@ -1,13 +1,7 @@
-// export const newsAPI = {
-//   getAll: () => alert('kjsdnf'),
-//   getById: (id) => api.get(`/news/${id}`),
-//   create: (data) => api.post('/news', data),
-//   update: (id, data) => api.put(`/news/${id}`, data),
-//   delete: (id) => api.delete(`/news/${id}`),
-// };
+
 
 import axios from 'axios';
-import { getAdminApiUrl, getApiUrl } from '../Utils/env';
+import { getApiUrl } from '../Utils/env';
 
 
 const api = axios.create({
@@ -17,6 +11,15 @@ const api = axios.create({
   },
   withCredentials: true
 });
+
+// a promise queue to prevent multiple refreshes at once
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+function onRefreshed(newToken) {
+  refreshSubscribers.forEach(cb => cb(newToken));
+  refreshSubscribers = [];
+}
 
 
 // Add request interceptor to include auth token
@@ -32,60 +35,74 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor to handle common errors
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-
     const originalRequest = error.config;
-    console.log(originalRequest)
 
-    // If token expired and we haven’t retried yet
-    if (error.response?.code === "token_expired") {
+    // only handle 401 once per request
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-          alert('kjnrljk')
 
+      // If a refresh is already happening, queue this request
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshSubscribers.push((token) => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
       try {
-        // Call the refresh endpoint (cookie is automatically sent)
-        const res = await axios.post(
-          'http://localhost:8000/api/refresh',
-          {},
-          { withCredentials: true }
-        );
-
+        const res = await api.get(getApiUrl('refresh'));
         const newAccessToken = res.data.access_token;
-        sessionStorage.setItem('auth', newAccessToken);
 
-        // Update Authorization header and retry original request
+        localStorage.setItem('auth', newAccessToken);
+        api.defaults.headers['Authorization'] = `Bearer ${newAccessToken}`;
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+
+        // notify queued requests
+        onRefreshed(newAccessToken);
+        isRefreshing = false;
+
+        // retry the original request
         return api(originalRequest);
       } catch (refreshError) {
-        console.error('Refresh failed', refreshError);
-        // Optionally redirect to login if refresh fails
+        isRefreshing = false;
+        console.error('Token refresh failed:', refreshError);
+        // optionally redirect to login
+        // window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
     }
 
-    // If refresh also fails → logout
     return Promise.reject(error);
   }
 );
 
-export const callPost = async (endpoint, payload) => {
-
-  return api.post(`${getAdminApiUrl()}${endpoint}`,payload)
-
-  // login: (credentials) => api.post(getApiUrl('login'), credentials),
-  // logout: () => api.post('/api/logout'),
-  // getUser: () => api.get('/api/user'),
+export const newsAPIAuth = {
+  getLogin: async (credentials) => {
+    return await api.post(getApiUrl('login'),credentials,{withCredentials:true})
+  },
 };
 
+
 export const newsAPI = {
-  // getAll: () => api.get('/api/news'),
+  // getLogin: () => api.post(getApiUrl('login')),
+  getLogin: (credentials) => {
+    api.create({withCredentials: true})
+    api.post(getApiUrl('login'),credentials)
+  },
   // getById: (id) => api.get(`/api/news/${id}`),
   // create: (data) => api.post('/api/news', data),
   // update: (id, data) => api.patch(`/api/news/${id}`, data),
   // delete: (id) => api.delete(`/api/news/${id}`),
 };
+
 
 export const newsAPINews = {
   getAll: async () => api.get(getApiUrl('news/get-news')),

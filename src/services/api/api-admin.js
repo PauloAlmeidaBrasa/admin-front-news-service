@@ -105,7 +105,9 @@ export const newsAPI = {
 
 
 export const newsAPINews = {
-  getAll: async () => api.get(getApiUrl('news/get-news')),
+  getAll: async () => {
+    return api.get(getApiUrl('news/get-news')) 
+  },
   // getById: (id) => api.get(`/api/news/${id}`),
   // create: (data) => api.post('/api/news', data),
   // update: (id, data) => api.patch(`/api/news/${id}`, data),

@@ -57,7 +57,8 @@ api.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        const res = await api.get(getApiUrl('refresh'));
+
+        const res = await axios.get(getApiUrl('refresh'));
         const newAccessToken = res.data.access_token;
 
         localStorage.setItem('auth', newAccessToken);
@@ -74,8 +75,9 @@ api.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false;
         console.error('Token refresh failed:', refreshError);
-        // optionally redirect to login
-        // window.location.href = '/login';
+
+       // optionally redirect to login
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }

@@ -9,6 +9,8 @@ import NewsList from './pages/news/NewsList';
 import NewsCreate from './pages/news/NewsCreate';
 import NewsEdit from './pages/news/NewsEdit';
 import Login from './pages/login/Login';
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 
 const theme = createTheme({
   palette: {
@@ -24,7 +26,10 @@ const theme = createTheme({
 const queryClient = new QueryClient();
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const { auth } = useContext(AuthContext);
+
+  const isAuthenticated = !!auth?.token;
+
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -41,7 +46,7 @@ function App() {
               </Routes>
             </Layout>
           ) : (
-            <Login onLogin={() => setIsAuthenticated(true)} />
+            <Login />
           )}
         </Router>
       </ThemeProvider>

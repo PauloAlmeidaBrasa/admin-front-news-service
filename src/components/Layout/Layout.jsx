@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext  } from 'react';
 import { styled } from '@mui/material/styles';
 import {
   Box,
@@ -22,6 +22,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 const drawerWidth = 240;
 
@@ -46,6 +47,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
 
 const Layout = ({ children }) => {
   const [open, setOpen] = useState(true);
+  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -105,8 +107,11 @@ const Layout = ({ children }) => {
         <Divider />
         <List>
           <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon><LogoutIcon /></ListItemIcon>
+            <ListItemButton onClick={() => {
+                  logout();
+                  navigate('/login');  // optional redirect
+              }}>
+                <ListItemIcon><LogoutIcon /></ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItemButton>
           </ListItem>

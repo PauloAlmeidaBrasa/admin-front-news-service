@@ -57,6 +57,8 @@ api.interceptors.response.use(
 
       isRefreshing = true;
       try {
+
+
         const res = await api.get(getApiUrl('refresh'));
         const newAccessToken = res.data.access_token;
 
@@ -75,7 +77,8 @@ api.interceptors.response.use(
         isRefreshing = false;
         console.error('Token refresh failed:', refreshError);
         // optionally redirect to login
-        // window.location.href = '/login';
+        sessionStorage.removeItem('auth');
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }

@@ -32,7 +32,6 @@ function App() {
 
 
   return (
-    <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
@@ -50,7 +49,6 @@ function App() {
           )}
         </Router>
       </ThemeProvider>
-    </QueryClientProvider>
   );
 }
 

@@ -19,9 +19,14 @@ import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
-import { newsAPI } from '../../services/api/api-admin';
+import { useNews } from '../../context/NewsContext';
+import { useCategory } from '../../context/CategoryContext';
 
 const NewsCreate = () => {
+
+  const { addNews, addNewsIsLoading } = useNews();
+  const { categories, categoriesLoading } = useCategory();
+
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     title: '',
@@ -29,24 +34,26 @@ const NewsCreate = () => {
     content: '',
     status: 'draft',
     published_at: '',
+    category_id: ''
   });
   const [errors, setErrors] = React.useState({});
 
-  const createMutation = useMutation({
-    mutationFn: (data) => newsAPI.create(data),
-    onSuccess: () => {
-      navigate('/news');
-    },
-    onError: (error) => {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: 'Failed to create news article' });
-      }
-    },
-  });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
+  };
+  const handleChangeCategory = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -80,7 +87,7 @@ const NewsCreate = () => {
       published_at: formData.published_at || null,
     };
 
-    createMutation.mutate(submitData);
+    addNews(submitData);
   };
 
   const handleBack = () => {
@@ -197,6 +204,28 @@ const NewsCreate = () => {
                     <MenuItem value="published">Published</MenuItem>
                   </TextField>
                 </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="Category"
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleChangeCategory}
+                    helperText="Select a category"
+                    disabled={categoriesLoading}
+                  >
+                    {categoriesLoading ? (
+                      <MenuItem disabled>Loading...</MenuItem>
+                    ) : (
+                      categories.data.category.map(cat => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </MenuItem>
+                      ))
+                    )}
+                  </TextField>
+                </Grid>
 
                 {/* Publish Date */}
                 <Grid item xs={12}>
@@ -221,14 +250,14 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={createMutation.isLoading}
+                      disabled={addNewsIsLoading}
                       startIcon={
-                        createMutation.isLoading ? 
+                        addNewsIsLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {createMutation.isLoading ? 'Creating...' : 'Create News'}
+                      {addNewsIsLoading ? 'Creating...' : 'Create News'}
                     </Button>
                     
                     <Button
@@ -236,7 +265,7 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={createMutation.isLoading}
+                      disabled={addNewsIsLoading}
                     >
                       Cancel
                     </Button>

@@ -30,11 +30,11 @@ const NewsCreate = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     title: '',
-    excerpt: '',
-    content: '',
+    subtitle: '',
+    text: '',
     status: 'draft',
     published_at: '',
-    category_id: ''
+    category: ''
   });
   const [errors, setErrors] = React.useState({});
 
@@ -74,7 +74,8 @@ const NewsCreate = () => {
     // Basic validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.content.trim()) newErrors.content = 'Content is required';
+    if (!formData.text.trim()) newErrors.content = 'Content is required';
+    if (!formData.category) newErrors.category = 'Content is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -146,8 +147,8 @@ const NewsCreate = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Excerpt"
-                      name="excerpt"
+                      label="Sub-title"
+                      name="subtitle"
                       value={formData.excerpt}
                       onChange={handleChange}
                       error={!!errors.excerpt}
@@ -163,7 +164,7 @@ const NewsCreate = () => {
                     <TextField
                       fullWidth
                       label="Content"
-                      name="content"
+                      name="text"
                       value={formData.content}
                       onChange={handleChange}
                       error={!!errors.content}
@@ -209,8 +210,8 @@ const NewsCreate = () => {
                     fullWidth
                     select
                     label="Category"
-                    name="category_id"
-                    value={formData.category_id}
+                    name="category"
+                    value={formData.category}
                     onChange={handleChangeCategory}
                     helperText="Select a category"
                     disabled={categoriesLoading}

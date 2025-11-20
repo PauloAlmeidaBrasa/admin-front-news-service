@@ -19,34 +19,41 @@ import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
-import { newsAPI } from '../../services/api/api-admin';
+import { useNews } from '../../context/NewsContext';
+import { useCategory } from '../../context/CategoryContext';
 
 const NewsCreate = () => {
+
+  const { addNews, addNewsIsLoading } = useNews();
+  const { categories, categoriesLoading } = useCategory();
+
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
     title: '',
-    excerpt: '',
-    content: '',
+    subtitle: '',
+    text: '',
     status: 'draft',
     published_at: '',
+    category: ''
   });
   const [errors, setErrors] = React.useState({});
 
-  const createMutation = useMutation({
-    mutationFn: (data) => newsAPI.create(data),
-    onSuccess: () => {
-      navigate('/news');
-    },
-    onError: (error) => {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: 'Failed to create news article' });
-      }
-    },
-  });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
+  };
+  const handleChangeCategory = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -67,7 +74,8 @@ const NewsCreate = () => {
     // Basic validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.content.trim()) newErrors.content = 'Content is required';
+    if (!formData.text.trim()) newErrors.content = 'Content is required';
+    if (!formData.category) newErrors.category = 'Content is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -80,7 +88,7 @@ const NewsCreate = () => {
       published_at: formData.published_at || null,
     };
 
-    createMutation.mutate(submitData);
+    addNews(submitData);
   };
 
   const handleBack = () => {
@@ -139,8 +147,8 @@ const NewsCreate = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Excerpt"
-                      name="excerpt"
+                      label="Sub-title"
+                      name="subtitle"
                       value={formData.excerpt}
                       onChange={handleChange}
                       error={!!errors.excerpt}
@@ -156,7 +164,7 @@ const NewsCreate = () => {
                     <TextField
                       fullWidth
                       label="Content"
-                      name="content"
+                      name="text"
                       value={formData.content}
                       onChange={handleChange}
                       error={!!errors.content}
@@ -197,6 +205,28 @@ const NewsCreate = () => {
                     <MenuItem value="published">Published</MenuItem>
                   </TextField>
                 </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    select
+                    label="Category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChangeCategory}
+                    helperText="Select a category"
+                    disabled={categoriesLoading}
+                  >
+                    {categoriesLoading ? (
+                      <MenuItem disabled>Loading...</MenuItem>
+                    ) : (
+                      categories.data.category.map(cat => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </MenuItem>
+                      ))
+                    )}
+                  </TextField>
+                </Grid>
 
                 {/* Publish Date */}
                 <Grid item xs={12}>
@@ -221,14 +251,14 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={createMutation.isLoading}
+                      disabled={addNewsIsLoading}
                       startIcon={
-                        createMutation.isLoading ? 
+                        addNewsIsLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {createMutation.isLoading ? 'Creating...' : 'Create News'}
+                      {addNewsIsLoading ? 'Creating...' : 'Create News'}
                     </Button>
                     
                     <Button
@@ -236,7 +266,7 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={createMutation.isLoading}
+                      disabled={addNewsIsLoading}
                     >
                       Cancel
                     </Button>

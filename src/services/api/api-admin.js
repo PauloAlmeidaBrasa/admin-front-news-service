@@ -112,7 +112,16 @@ export const newsAPINews = {
     return api.get(getApiUrl('news/get-news')) 
   },
   // getById: (id) => api.get(`/api/news/${id}`),
-  // create: (data) => api.post('/api/news', data),
+  add: (data) =>api.post(getApiUrl('news/add-news'), data),
+  // update: (id, data) => api.patch(`/api/news/${id}`, data),
+  // delete: (id) => api.delete(`/api/news/${id}`),
+};
+export const newsAPICategory = {
+  getAll: async () => {
+    return api.get(getApiUrl('category/get-category')) 
+  },
+  // getById: (id) => api.get(`/api/news/${id}`),
+  add: (data) =>api.post(getApiUrl('news/add-news'), data),
   // update: (id, data) => api.patch(`/api/news/${id}`, data),
   // delete: (id) => api.delete(`/api/news/${id}`),
 };

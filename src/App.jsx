@@ -11,6 +11,7 @@ import NewsEdit from './pages/news/NewsEdit';
 import Login from './pages/login/Login';
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
+import { CategoryProvider } from './context/CategoryContext';
 
 const theme = createTheme({
   palette: {
@@ -39,7 +40,11 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/news" element={<NewsList />} />
+                <Route path="/news" element={
+                  <CategoryProvider>
+                    <NewsCreate />
+                  </CategoryProvider>
+                } />
                 <Route path="/news/create" element={<NewsCreate />} />
                 <Route path="/news/edit/:id" element={<NewsEdit />} />
               </Routes>

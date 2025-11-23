@@ -12,7 +12,7 @@ const NewsList =  () => {
 
 
   const { data: news, isLoading } = useQuery({
-    queryKey: ['news'],
+    queryKey: ['news-list'],
     queryFn: () => newsAPINews.getAll()
   })
 

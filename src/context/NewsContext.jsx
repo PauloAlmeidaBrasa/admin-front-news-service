@@ -26,10 +26,24 @@ export const NewsProvider = ({ children }) => {
     },
     retry: false
   });
+    
+    const updateNewsMutation = useMutation({
+    mutationFn: (payload) => {
+      const newsId = payload.news_ID;
+      return newsAPINews.update(newsId, payload); // ✅ MUST return
+    },
+    onSuccess: () => {
+      // queryClient.invalidateQueries(['news-list']);
+      // navigate('/news'); 
+    },
+    onError: (error) => {
+      console.error("Update failed:", error);
+    },
+  });
 
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
+    const date = new Date(dateStr)
     return new Intl.DateTimeFormat('pt-BR', {
       dateStyle: 'short',
       timeStyle: 'short'
@@ -42,6 +56,7 @@ export const NewsProvider = ({ children }) => {
       newsIsLoading: addNewsMutation.isLoading,
       newsError: addNewsMutation.error,
       getNews : getNewsMutation.mutate,
+      update: updateNewsMutation.mutate,
       news, 
       formatDate, 
       setNews,

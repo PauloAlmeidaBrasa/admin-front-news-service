@@ -116,7 +116,9 @@ export const newsAPINews = {
     })
   },
   add: (data) =>api.post(getApiUrl('news/add-news'), data),
-  // update: (id, data) => api.patch(`/api/news/${id}`, data),
+  update: async (id,data) => {
+    return api.patch(getApiUrl(`news/update/${id}`), data)
+  }
   // delete: (id) => api.delete(`/api/news/${id}`),
 };
 export const newsAPICategory = {

@@ -29,17 +29,25 @@ const NewsEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = React.useState({
+    news_ID: '',
     title: '',
-    excerpt: '',
-    content: '',
+    subtitle: '',
+    text: '',
     status: 'draft',
-    published_at: '',
+    created_at: '',
   });
   const [errors, setErrors] = React.useState({});
 
   // Fetch news data
 
-  const { getNews, news, newsLoading, newsError, formatDate } = useNews()
+  const { 
+    getNews, 
+    news, 
+    newsLoading, 
+    newsError, 
+    formatDate,
+    update
+  } = useNews()
 
   React.useEffect(() => {
     getNews(id)
@@ -49,14 +57,14 @@ const NewsEdit = () => {
   // Update form when data is loaded
   React.useEffect(() => {
     if (news?.data?.news) {
-      const newsData = news.data.news;
       setFormData({
-        title: newsData.title || '',
-        excerpt: newsData.excerpt || '',
-        content: newsData.content || '',
-        status: newsData.status || 'draft',
-        published_at: newsData.published_at 
-          ? new Date(newsData.published_at).toISOString().slice(0, 16)
+        news_ID: originalNews[0].id,
+        title: originalNews[0].title || '',
+        subtitle: originalNews[0].subtitle || '',
+        text: originalNews[0].text || '',
+        status: originalNews[0].status || 'draft',
+        created_at: originalNews[0].created_at 
+          ? new Date(originalNews[0].created_at).toISOString().slice(0, 16)
           : '',
       });
     }
@@ -84,7 +92,7 @@ const NewsEdit = () => {
     // Basic validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.content.trim()) newErrors.content = 'Content is required';
+    if (!formData.text.trim()) newErrors.text = 'Content is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -92,13 +100,14 @@ const NewsEdit = () => {
     }
 
     // Prepare data for API
+    console.log(formData)
     const submitData = {
       ...formData,
-      published_at: formData.published_at || null,
-      _method: 'PUT' // For Laravel form method spoofing if needed
+      created_at: formData.published_at || null,
+      _method: 'PATCH' // For Laravel form method spoofing if needed
     };
 
-    updateMutation.mutate(submitData);
+    update(submitData)
   };
 
   const handleBack = () => {
@@ -201,7 +210,7 @@ const NewsEdit = () => {
                       fullWidth
                       label="News Title"
                       name="title"
-                      value={originalNews[0].title}
+                      value={formData.title}
                       onChange={handleChange}
                       error={!!errors.title}
                       helperText={errors.title}
@@ -210,13 +219,13 @@ const NewsEdit = () => {
                     />
                   </Grid>
 
-                  {/* Excerpt */}
+                  {/* TextField */}
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
                       label="Sub-title"
                       name="subtitle"
-                      value={originalNews[0].subtitle}
+                      value={formData.subtitle}
                       onChange={handleChange}
                       error={!!errors.excerpt}
                       helperText={errors.excerpt || "Brief summary of the news article (optional)"}
@@ -231,8 +240,8 @@ const NewsEdit = () => {
                     <TextField
                       fullWidth
                       label="Content"
-                      name="content"
-                      value={originalNews[0].text}
+                      name="text"
+                      value={formData.text}
                       onChange={handleChange}
                       error={!!errors.content}
                       helperText={errors.content}
@@ -279,8 +288,9 @@ const NewsEdit = () => {
                     fullWidth
                     type="datetime"
                     label="Publish Date & Time"
-                    name="published_at"
-                    value={formatDate(originalNews[0].created_at)}
+                    name="created_at"
+                    value={formData.created_at}
+                    // value={formatDate(formData.published_at)}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
                     helperText="Schedule publication for a specific date and time"
@@ -351,7 +361,7 @@ const NewsEdit = () => {
                   </Typography>
                 </Box>
 
-                {originalNews.published_at && (
+                {originalNews.created_at && (
                   <>
                     <Divider />
                     <Box>
@@ -359,7 +369,7 @@ const NewsEdit = () => {
                         Originally Published
                       </Typography>
                       <Typography variant="body2">
-                        {new Date(originalNews.published_at).toLocaleString()}
+                        {new Date(originalNews.created_at).toLocaleString()}
                       </Typography>
                     </Box>
                   </>

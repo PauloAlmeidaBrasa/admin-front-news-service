@@ -19,6 +19,14 @@ export const NewsProvider = ({ children }) => {
     }
   });
 
+  const getNewsMutation = useMutation({
+    mutationFn: (payload) => newsAPINews.getById(payload),   // POST /news
+      onSuccess: (response) => {
+      setNews(response.data);
+    },
+    retry: false
+  });
+
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
@@ -31,8 +39,9 @@ export const NewsProvider = ({ children }) => {
   return (
     <NewsContext.Provider value={{ 
       addNews: addNewsMutation.mutate,
-      addNewsIsLoading: addNewsMutation.isLoading,
-      addNewsError: addNewsMutation.error,
+      newsIsLoading: addNewsMutation.isLoading,
+      newsError: addNewsMutation.error,
+      getNews : getNewsMutation.mutate,
       news, 
       formatDate, 
       setNews,

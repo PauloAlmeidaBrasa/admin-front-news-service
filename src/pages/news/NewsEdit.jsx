@@ -23,6 +23,7 @@ import {
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
 import { newsAPI } from '../../services/api/api-admin';
+import { useNews } from '../../context/NewsContext';
 
 const NewsEdit = () => {
   const navigate = useNavigate();
@@ -37,16 +38,18 @@ const NewsEdit = () => {
   const [errors, setErrors] = React.useState({});
 
   // Fetch news data
-  const { data: news, isLoading, error } = useQuery({
-    queryKey: ['news', id],
-    queryFn: () => newsAPI.getById(id),
-    enabled: !!id,
-  });
+
+  const { getNews, news, newsLoading, newsError, formatDate } = useNews()
+
+  React.useEffect(() => {
+    getNews(id)
+  }, [id])
+
 
   // Update form when data is loaded
   React.useEffect(() => {
-    if (news?.data) {
-      const newsData = news.data;
+    if (news?.data?.news) {
+      const newsData = news.data.news;
       setFormData({
         title: newsData.title || '',
         excerpt: newsData.excerpt || '',
@@ -59,19 +62,6 @@ const NewsEdit = () => {
     }
   }, [news]);
 
-  const updateMutation = useMutation({
-    mutationFn: (data) => newsAPI.update(id, data),
-    onSuccess: () => {
-      navigate('/news');
-    },
-    onError: (error) => {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: 'Failed to update news article' });
-      }
-    },
-  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -115,7 +105,7 @@ const NewsEdit = () => {
     navigate('/news');
   };
 
-  if (isLoading) {
+  if (newsLoading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4, textAlign: 'center' }}>
         <CircularProgress />
@@ -126,11 +116,11 @@ const NewsEdit = () => {
     );
   }
 
-  if (error) {
+  if (newsError) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error" sx={{ mb: 3 }}>
-          Failed to load news article: {error.message}
+          Failed to load news article: {newsError}
         </Alert>
         <Button startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Back to News
@@ -139,7 +129,7 @@ const NewsEdit = () => {
     );
   }
 
-  if (!news?.data) {
+  if (!news?.data?.news) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="warning" sx={{ mb: 3 }}>
@@ -152,7 +142,7 @@ const NewsEdit = () => {
     );
   }
 
-  const originalNews = news.data;
+  const originalNews = news?.data?.news;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -211,7 +201,7 @@ const NewsEdit = () => {
                       fullWidth
                       label="News Title"
                       name="title"
-                      value={formData.title}
+                      value={originalNews[0].title}
                       onChange={handleChange}
                       error={!!errors.title}
                       helperText={errors.title}
@@ -224,9 +214,9 @@ const NewsEdit = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Excerpt"
-                      name="excerpt"
-                      value={formData.excerpt}
+                      label="Sub-title"
+                      name="subtitle"
+                      value={originalNews[0].subtitle}
                       onChange={handleChange}
                       error={!!errors.excerpt}
                       helperText={errors.excerpt || "Brief summary of the news article (optional)"}
@@ -242,7 +232,7 @@ const NewsEdit = () => {
                       fullWidth
                       label="Content"
                       name="content"
-                      value={formData.content}
+                      value={originalNews[0].text}
                       onChange={handleChange}
                       error={!!errors.content}
                       helperText={errors.content}
@@ -287,10 +277,10 @@ const NewsEdit = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    type="datetime-local"
+                    type="datetime"
                     label="Publish Date & Time"
                     name="published_at"
-                    value={formData.published_at}
+                    value={formatDate(originalNews[0].created_at)}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
                     helperText="Schedule publication for a specific date and time"
@@ -306,14 +296,14 @@ const NewsEdit = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={updateMutation.isLoading}
+                      disabled={newsLoading}
                       startIcon={
-                        updateMutation.isLoading ? 
+                        newsLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {updateMutation.isLoading ? 'Updating...' : 'Update News'}
+                      {newsLoading ? 'Updating...' : 'Update News'}
                     </Button>
                     
                     <Button
@@ -321,7 +311,7 @@ const NewsEdit = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={updateMutation.isLoading}
+                      disabled={newsLoading}
                     >
                       Cancel
                     </Button>

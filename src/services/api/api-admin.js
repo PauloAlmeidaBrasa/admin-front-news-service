@@ -25,10 +25,9 @@ function onRefreshed(newToken) {
 // Add request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
-    // console.log(localStorage.getItem('auth_token'))
     const token = localStorage.getItem('auth');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -96,10 +95,10 @@ export const newsAPIAuth = {
 
 export const newsAPI = {
   // getLogin: () => api.post(getApiUrl('login')),
-  getLogin: (credentials) => {
-    api.create({withCredentials: true})
-    api.post(getApiUrl('login'),credentials)
-  },
+  // getLogin: (credentials) => {
+  //   api.create({withCredentials: true})
+  //   api.post(getApiUrl('login'),credentials)
+  // },
   // getById: (id) => api.get(`/api/news/${id}`),
   // create: (data) => api.post('/api/news', data),
   // update: (id, data) => api.patch(`/api/news/${id}`, data),
@@ -111,7 +110,11 @@ export const newsAPINews = {
   getAll: async () => {
     return api.get(getApiUrl('news/get-news')) 
   },
-  // getById: (id) => api.get(`/api/news/${id}`),
+  getById: async (newsId) => {
+    return api.get(getApiUrl('news/get-news'), {
+      params: { news_ID: newsId }
+    })
+  },
   add: (data) =>api.post(getApiUrl('news/add-news'), data),
   // update: (id, data) => api.patch(`/api/news/${id}`, data),
   // delete: (id) => api.delete(`/api/news/${id}`),

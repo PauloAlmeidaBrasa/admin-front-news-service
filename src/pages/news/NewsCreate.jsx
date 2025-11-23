@@ -24,7 +24,7 @@ import { useCategory } from '../../context/CategoryContext';
 
 const NewsCreate = () => {
 
-  const { addNews, addNewsIsLoading } = useNews();
+  const { addNews, newsLoading } = useNews();
   const { categories, categoriesLoading } = useCategory();
 
   const navigate = useNavigate();
@@ -251,14 +251,14 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={addNewsIsLoading}
+                      disabled={newsLoading}
                       startIcon={
-                        addNewsIsLoading ? 
+                        newsLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {addNewsIsLoading ? 'Creating...' : 'Create News'}
+                      {newsLoading ? 'Creating...' : 'Create News'}
                     </Button>
                     
                     <Button
@@ -266,7 +266,7 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={addNewsIsLoading}
+                      disabled={newsLoading}
                     >
                       Cancel
                     </Button>

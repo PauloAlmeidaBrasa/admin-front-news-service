@@ -40,12 +40,12 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/news" element={
+                <Route path="/news" element={ <NewsList /> } />
+                <Route path="/news/create" element={
                   <CategoryProvider>
                     <NewsCreate />
                   </CategoryProvider>
                 } />
-                <Route path="/news/create" element={<NewsCreate />} />
                 <Route path="/news/edit/:id" element={<NewsEdit />} />
               </Routes>
             </Layout>

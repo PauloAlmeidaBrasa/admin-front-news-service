@@ -64,4 +64,15 @@ export const useUpdateNews = (options = {}) => {
       queryClient.invalidateQueries(['news-list']);
     },
   });
-};
+}
+export function useDeleteNews() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id) => newsAPINews.delete(id),
+    onSuccess: () => {
+      // Refresh the table after deletion
+      queryClient.invalidateQueries(['news-list']);
+    },
+  });
+}

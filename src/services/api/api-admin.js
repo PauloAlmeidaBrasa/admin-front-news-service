@@ -118,8 +118,8 @@ export const newsAPINews = {
   add: (data) =>api.post(getApiUrl('news/add-news'), data),
   update: async (id,data) => {
     return api.patch(getApiUrl(`news/update/${id}`), data)
-  }
-  // delete: (id) => api.delete(`/api/news/${id}`),
+  },
+  delete: (id) => api.post(getApiUrl('news/delete'),{news_ID: id}),
 };
 export const newsAPICategory = {
   getAll: async () => {

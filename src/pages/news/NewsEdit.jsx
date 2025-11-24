@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
@@ -22,13 +22,17 @@ import {
   Update as UpdateIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
-import { newsAPI } from '../../services/api/api-admin';
-import { useNews } from '../../context/NewsContext';
+// import { useNews } from '../../context/NewsContext';
+import { useNewsById, useUpdateNews } from "../../hooks/useNews"
+
 
 const NewsEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [formData, setFormData] = React.useState({
+
+  const { data: news, isLoading, error } = useNewsById(id);
+
+  const [formData, setFormData] = useState({
     news_ID: '',
     title: '',
     subtitle: '',
@@ -36,39 +40,32 @@ const NewsEdit = () => {
     status: 'draft',
     created_at: '',
   });
-  const [errors, setErrors] = React.useState({});
-
-  // Fetch news data
-
-  const { 
-    getNews, 
-    news, 
-    newsLoading, 
-    newsError, 
-    formatDate,
-    update
-  } = useNews()
-
-  React.useEffect(() => {
-    getNews(id)
-  }, [id])
 
 
   // Update form when data is loaded
-  React.useEffect(() => {
-    if (news?.data?.news) {
+  useEffect(() => {
+    let newsData = news?.data?.data?.news
+    if (newsData) {
+
       setFormData({
-        news_ID: originalNews[0].id,
-        title: originalNews[0].title || '',
-        subtitle: originalNews[0].subtitle || '',
-        text: originalNews[0].text || '',
-        status: originalNews[0].status || 'draft',
-        created_at: originalNews[0].created_at 
-          ? new Date(originalNews[0].created_at).toISOString().slice(0, 16)
+        news_ID: newsData[0].id,
+        title: newsData[0].title || '',
+        subtitle: newsData[0].subtitle || '',
+        text: newsData[0].text || '',
+        status: newsData[0].status || 'draft',
+        created_at: newsData[0].created_at 
+          ? new Date(newsData[0].created_at).toISOString().slice(0, 16)
           : '',
       });
     }
   }, [news]);
+
+  const updateNews = useUpdateNews({
+    onSuccess: () => {
+      navigate('/news');
+      queryClient.invalidateQueries(['news-list']);
+    },
+  });
 
 
   const handleChange = (e) => {
@@ -78,7 +75,7 @@ const NewsEdit = () => {
       [name]: value
     }));
     // Clear error when user starts typing
-    if (errors[name]) {
+    if (error) {
       setErrors(prev => ({
         ...prev,
         [name]: null
@@ -107,14 +104,24 @@ const NewsEdit = () => {
       _method: 'PATCH' // For Laravel form method spoofing if needed
     };
 
-    update(submitData)
+    updateNews.mutate({
+      id,
+      payload: submitData,
+    });
+
+    // updateNews.mutate(submitData);
+
+
+    // update(submitData)
   };
 
   const handleBack = () => {
     navigate('/news');
   };
 
-  if (newsLoading) {
+   const originalNews = news?.data?.data?.news
+
+  if (isLoading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4, textAlign: 'center' }}>
         <CircularProgress />
@@ -125,11 +132,11 @@ const NewsEdit = () => {
     );
   }
 
-  if (newsError) {
+  if (error) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error" sx={{ mb: 3 }}>
-          Failed to load news article: {newsError}
+          Failed to load news article: {error}
         </Alert>
         <Button startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Back to News
@@ -138,7 +145,7 @@ const NewsEdit = () => {
     );
   }
 
-  if (!news?.data?.news) {
+  if (!originalNews) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="warning" sx={{ mb: 3 }}>
@@ -151,7 +158,7 @@ const NewsEdit = () => {
     );
   }
 
-  const originalNews = news?.data?.news;
+ 
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -191,9 +198,9 @@ const NewsEdit = () => {
       </Box>
 
       {/* Error Alert */}
-      {errors.general && (
+      {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {errors.general}
+          {error.general}
         </Alert>
       )}
 
@@ -202,7 +209,9 @@ const NewsEdit = () => {
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent sx={{ p: 4 }}>
-              <Box component="form" onSubmit={handleSubmit} noValidate>
+              <Box component="form" 
+              // onSubmit={handleSubmit} 
+              noValidate>
                 <Grid container spacing={3}>
                   {/* Title */}
                   <Grid item xs={12}>
@@ -212,8 +221,8 @@ const NewsEdit = () => {
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      error={!!errors.title}
-                      helperText={errors.title}
+                      error={!!error}
+                      helperText={error}
                       required
                       placeholder="Enter a compelling title for your news article"
                     />
@@ -227,8 +236,8 @@ const NewsEdit = () => {
                       name="subtitle"
                       value={formData.subtitle}
                       onChange={handleChange}
-                      error={!!errors.excerpt}
-                      helperText={errors.excerpt || "Brief summary of the news article (optional)"}
+                      error={!!error}
+                      helperText={error || "Brief summary of the news article (optional)"}
                       multiline
                       rows={3}
                       placeholder="Provide a short summary that will appear in news listings..."
@@ -243,8 +252,8 @@ const NewsEdit = () => {
                       name="text"
                       value={formData.text}
                       onChange={handleChange}
-                      error={!!errors.content}
-                      helperText={errors.content}
+                      error={!!error}
+                      helperText={error}
                       required
                       multiline
                       rows={12}
@@ -306,14 +315,14 @@ const NewsEdit = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={newsLoading}
+                      disabled={isLoading}
                       startIcon={
-                        newsLoading ? 
+                        isLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {newsLoading ? 'Updating...' : 'Update News'}
+                      {isLoading ? 'Updating...' : 'Update News'}
                     </Button>
                     
                     <Button
@@ -321,7 +330,7 @@ const NewsEdit = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={newsLoading}
+                      disabled={isLoading}
                     >
                       Cancel
                     </Button>

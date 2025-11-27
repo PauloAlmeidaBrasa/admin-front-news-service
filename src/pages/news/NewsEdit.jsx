@@ -62,8 +62,7 @@ const NewsEdit = () => {
 
   const updateNews = useUpdateNews({
     onSuccess: () => {
-      // navigate('/news');
-      // queryClient.invalidateQueries(['news-list']);
+      navigate('/news');
     },
   });
 

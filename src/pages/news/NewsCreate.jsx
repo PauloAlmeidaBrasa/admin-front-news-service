@@ -19,13 +19,16 @@ import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
-import { useCategory } from '../../context/CategoryContext';
+import { useCategoryList } from '../../hooks/useCategory';
 import { useAddNews } from "../../hooks/useNews"
 
 
 const NewsCreate = () => {
 
-  const { categories, categoriesLoading } = useCategory();
+  // const { categories, isLoading } = useCategory();
+
+  const { data: categories } = useCategoryList();
+
 
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
@@ -224,12 +227,13 @@ const NewsCreate = () => {
                     helperText={errors.category || "Select a category"}
                     required
                     error={!!errors.category}
-                    disabled={categoriesLoading}
+                    disabled={isLoading}
                   >
-                    {categoriesLoading ? (
+                    {console.log(categories)}
+                    {isLoading ? (
                       <MenuItem disabled>Loading...</MenuItem>
                     ) : (
-                      categories.data.category.map(cat => (
+                      categories?.data?.category.map(cat => (
                         <MenuItem key={cat.id} value={cat.id}>
                           {cat.name}
                         </MenuItem>

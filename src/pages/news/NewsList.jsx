@@ -1,14 +1,12 @@
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Edit, Trash2, Search } from 'lucide-react'
-import { NewsContext } from '../../context/NewsContext'
-import { useNewsList, useDeleteNews } from "../../hooks/useNews"
+import { useNewsList, useDeleteNews, formatDate } from "../../hooks/useNews"
 
 
 const NewsList =  () => {
-  const { formatDate } = useContext(NewsContext);
-  const [searchTerm, setSearchTerm] = useState('')
 
+  const [searchTerm, setSearchTerm] = useState('')
   const { data: newsList, isLoading } = useNewsList();
 
   const deleteNews = useDeleteNews();

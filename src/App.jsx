@@ -9,7 +9,7 @@ import NewsCreate from './pages/news/NewsCreate';
 import NewsEdit from './pages/news/NewsEdit';
 import Login from './pages/login/Login';
 
-import { CategoryProvider } from './context/CategoryContext';
+import { CategoryProvider } from './context/_CategoryContext';
 import { useLocation } from 'react-router-dom';
 
 const theme = createTheme({
@@ -47,13 +47,7 @@ function App() {
           <>
             <Route path="/" element={<Layout><Dashboard /></Layout>} />
             <Route path="/news" element={<Layout><NewsList /></Layout>} />
-            <Route path="/news/create" element={
-              <Layout>
-                <CategoryProvider>
-                  <NewsCreate />
-                </CategoryProvider>
-              </Layout>
-            } />
+            <Route path="/news/create" element={<Layout><NewsCreate /></Layout>} />
             <Route path="/news/edit/:id" element={<Layout><NewsEdit /></Layout>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>

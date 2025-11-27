@@ -22,7 +22,6 @@ import {
   Update as UpdateIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
-// import { useNews } from '../../context/NewsContext';
 import { useNewsById, useUpdateNews } from "../../hooks/useNews"
 
 

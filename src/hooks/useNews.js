@@ -36,12 +36,15 @@ export const useNewsById = (id) => {
 // -----------------------------
 // Create News
 // -----------------------------
-export const useAddNews = () => {
+export const useAddNews = (options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (payload) => newsAPINews.add(payload),
-    onSuccess: () => {
+    onSuccess: (...args) => {
+      if (options.onSuccess) {
+        options.onSuccess(...args);
+      }
       queryClient.invalidateQueries(['news-list']); // auto refresh list
     },
   });

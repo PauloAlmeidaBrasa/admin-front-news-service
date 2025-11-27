@@ -19,13 +19,16 @@ import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
-import { useNews } from '../../context/NewsContext';
-import { useCategory } from '../../context/CategoryContext';
+import { useCategoryList } from '../../hooks/useCategory';
+import { useAddNews } from "../../hooks/useNews"
+
 
 const NewsCreate = () => {
 
-  const { addNews, newsLoading } = useNews();
-  const { categories, categoriesLoading } = useCategory();
+  // const { categories, isLoading } = useCategory();
+
+  const { data: categories } = useCategoryList();
+
 
   const navigate = useNavigate();
   const [formData, setFormData] = React.useState({
@@ -37,6 +40,12 @@ const NewsCreate = () => {
     category: ''
   });
   const [errors, setErrors] = React.useState({});
+
+   const {mutate: addNews, isLoading} = useAddNews({
+    onSuccess: () => {
+      navigate('/news');
+    },
+  });
 
 
   const handleChange = (e) => {
@@ -75,9 +84,11 @@ const NewsCreate = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.text.trim()) newErrors.content = 'Content is required';
-    if (!formData.category) newErrors.category = 'Content is required';
+    if (!formData.category) newErrors.category = 'category is required';
 
+    console.log(newErrors)
     if (Object.keys(newErrors).length > 0) {
+      console.log('ljkdla')
       setErrors(newErrors);
       return;
     }
@@ -149,7 +160,7 @@ const NewsCreate = () => {
                       fullWidth
                       label="Sub-title"
                       name="subtitle"
-                      value={formData.excerpt}
+                      value={formData.subtitle}
                       onChange={handleChange}
                       error={!!errors.excerpt}
                       helperText={errors.excerpt || "Brief summary of the news article (optional)"}
@@ -213,13 +224,16 @@ const NewsCreate = () => {
                     name="category"
                     value={formData.category}
                     onChange={handleChangeCategory}
-                    helperText="Select a category"
-                    disabled={categoriesLoading}
+                    helperText={errors.category || "Select a category"}
+                    required
+                    error={!!errors.category}
+                    disabled={isLoading}
                   >
-                    {categoriesLoading ? (
+                    {console.log(categories)}
+                    {isLoading ? (
                       <MenuItem disabled>Loading...</MenuItem>
                     ) : (
-                      categories.data.category.map(cat => (
+                      categories?.data?.category.map(cat => (
                         <MenuItem key={cat.id} value={cat.id}>
                           {cat.name}
                         </MenuItem>
@@ -251,14 +265,14 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={newsLoading}
+                      disabled={isLoading}
                       startIcon={
-                        newsLoading ? 
+                        isLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {newsLoading ? 'Creating...' : 'Create News'}
+                      {isLoading ? 'Creating...' : 'Create News'}
                     </Button>
                     
                     <Button
@@ -266,7 +280,7 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={newsLoading}
+                      disabled={isLoading}
                     >
                       Cancel
                     </Button>

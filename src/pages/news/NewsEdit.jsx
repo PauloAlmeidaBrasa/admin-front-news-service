@@ -22,7 +22,6 @@ import {
   Update as UpdateIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
-// import { useNews } from '../../context/NewsContext';
 import { useNewsById, useUpdateNews } from "../../hooks/useNews"
 
 
@@ -62,8 +61,7 @@ const NewsEdit = () => {
 
   const updateNews = useUpdateNews({
     onSuccess: () => {
-      // navigate('/news');
-      // queryClient.invalidateQueries(['news-list']);
+      navigate('/news');
     },
   });
 

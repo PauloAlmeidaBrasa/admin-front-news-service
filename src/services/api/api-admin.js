@@ -125,9 +125,7 @@ export const newsAPINews = {
   delete: (id) => api.post(getApiUrl('news/delete'),{news_ID: id}),
 };
 export const newsAPICategory = {
-  getAll: async () => {
-    return api.get(getApiUrl('category/get-category')) 
-  },
+  getAll: () => api.get(getApiUrl('category/get-category')),
   // getById: (id) => api.get(`/api/news/${id}`),
   add: (data) =>api.post(getApiUrl('news/add-news'), data),
   // update: (id, data) => api.patch(`/api/news/${id}`, data),

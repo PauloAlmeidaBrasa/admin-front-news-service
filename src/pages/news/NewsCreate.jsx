@@ -19,12 +19,12 @@ import {
   ArrowBack as ArrowBackIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
-import { useNews } from '../../context/NewsContext';
 import { useCategory } from '../../context/CategoryContext';
+import { useAddNews } from "../../hooks/useNews"
+
 
 const NewsCreate = () => {
 
-  const { addNews, newsLoading } = useNews();
   const { categories, categoriesLoading } = useCategory();
 
   const navigate = useNavigate();
@@ -37,6 +37,12 @@ const NewsCreate = () => {
     category: ''
   });
   const [errors, setErrors] = React.useState({});
+
+   const {mutate: addNews, isLoading} = useAddNews({
+    onSuccess: () => {
+      navigate('/news');
+    },
+  });
 
 
   const handleChange = (e) => {
@@ -77,7 +83,9 @@ const NewsCreate = () => {
     if (!formData.text.trim()) newErrors.content = 'Content is required';
     if (!formData.category) newErrors.category = 'Content is required';
 
+    console.log(newErrors)
     if (Object.keys(newErrors).length > 0) {
+      console.log('ljkdla')
       setErrors(newErrors);
       return;
     }
@@ -251,14 +259,14 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={newsLoading}
+                      disabled={isLoading}
                       startIcon={
-                        newsLoading ? 
+                        isLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {newsLoading ? 'Creating...' : 'Create News'}
+                      {isLoading ? 'Creating...' : 'Create News'}
                     </Button>
                     
                     <Button
@@ -266,7 +274,7 @@ const NewsCreate = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={newsLoading}
+                      disabled={isLoading}
                     >
                       Cancel
                     </Button>

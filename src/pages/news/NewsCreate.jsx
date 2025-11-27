@@ -221,9 +221,9 @@ const NewsCreate = () => {
                     name="category"
                     value={formData.category}
                     onChange={handleChangeCategory}
-                    helperText="Select a category"
+                    helperText={errors.category || "Select a category"}
                     required
-                    error={!!errors.content}
+                    error={!!errors.category}
                     disabled={categoriesLoading}
                   >
                     {categoriesLoading ? (

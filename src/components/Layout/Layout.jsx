@@ -22,7 +22,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../../context/AuthContext';
+import { useLogout } from '../../hooks/useAuth'
 
 const drawerWidth = 240;
 
@@ -47,9 +47,14 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
 
 const Layout = ({ children }) => {
   const [open, setOpen] = useState(true);
-  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+
+  const logout = useLogout({
+      onSuccess: (data) => {
+      navigate('/login')
+    }
+  })
 
   const menuItems = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },

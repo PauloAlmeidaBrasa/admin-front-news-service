@@ -88,7 +88,10 @@ api.interceptors.response.use(
 
 export const newsAPIAuth = {
   getLogin: async (credentials) => {
-    return await api.post(getApiUrl('login'),credentials,{withCredentials:true})
+    return  api.post(getApiUrl('login'),credentials,{withCredentials:true}).then((res) => {
+
+      return res.data;
+    })
   },
 };
 

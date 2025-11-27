@@ -1,4 +1,3 @@
-// src/hooks/useNews.js
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { newsAPINews } from '../services/api/api-admin';
 

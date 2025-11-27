@@ -5,18 +5,21 @@ import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { NewsProvider } from './context/NewsContext.jsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter } from "react-router-dom";
+
 
 const queryClient = new QueryClient()
-
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
           <NewsProvider>
             <App />
           </NewsProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>
-);
+)

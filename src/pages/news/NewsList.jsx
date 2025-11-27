@@ -1,29 +1,26 @@
-import React, { useState, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Edit, Trash2, Search } from 'lucide-react'
-import { newsAPI, newsAPINews } from '../../services/api/api-admin'
 import { NewsContext } from '../../context/NewsContext'
+import { useNewsList, useDeleteNews } from "../../hooks/useNews"
+
 
 const NewsList =  () => {
   const { formatDate } = useContext(NewsContext);
   const [searchTerm, setSearchTerm] = useState('')
-  const queryClient = useQueryClient()
+
+  const { data: newsList, isLoading } = useNewsList();
+
+  const deleteNews = useDeleteNews();
+
+  const handleDelete = (newsId) => {
+    if (confirm("Are you sure you want to delete this news?")) {
+      deleteNews.mutate(newsId);
+    }
+  };
 
 
-  const { data: news, isLoading } = useQuery({
-    queryKey: ['news'],
-    queryFn: () => newsAPINews.getAll()
-  })
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => newsAPI.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['news'] })
-    },
-  })
-
-  let amountNews = news?.data?.data?.news
+  let amountNews = newsList?.data?.data?.news
   let filteredNews
 
   if(Array.isArray(amountNews)) {
@@ -129,7 +126,7 @@ const NewsList =  () => {
                     <Edit className="h-4 w-4 inline" />
                   </Link>
                   <button
-                    onClick={() => deleteMutation.mutate(item.id)}
+                    onClick={() => handleDelete(item.id)}
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="h-4 w-4 inline" />

@@ -1,4 +1,4 @@
-import  { useState, useContext  } from 'react';
+import  { useState } from 'react';
 import {
   Container,
   Card,
@@ -11,43 +11,23 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Lock as LockIcon } from '@mui/icons-material';
-import { useMutation } from '@tanstack/react-query';
-import { AuthContext } from '../../context/AuthContext';
+import { useLogin } from '../../hooks/useAuth'
+import { useNavigate } from 'react-router-dom';
 
-const Login = ({ onLogin }) => {
-  const { login } = useContext(AuthContext);
+
+const Login = () => {
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [errors, setErrors] = useState({});
 
-  const loginMutation = useMutation({
-    mutationFn: (credentials) => login(credentials),
-    onSuccess: (response) => {
-
-      if(response.data.error == "invalid_credentials") {
-        setErrors({ general: response.data.message })
-        return
-      }
-      // Handle successful login
-      const { access_token, user } = response.data;
-      
-      // Store token and user data
-      localStorage.setItem('auth', access_token);
-      localStorage.setItem('user', JSON.stringify(user));
-      
-      onLogin();
-    },
-    onError: (error) => {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else if (error.response?.data?.message) {
-        setErrors({ general: error.response.data.message });
-      } else {
-        setErrors({ general: 'Login failed. Please try again.' });
-      }
-    },
+  const { mutate: login, isLoading, isError, error } = useLogin({
+    onSuccess: (data) => {
+      navigate('/news')
+    }
   });
 
   const handleChange = (e) => {
@@ -56,7 +36,6 @@ const Login = ({ onLogin }) => {
       ...prev,
       [name]: value
     }));
-    // Clear errors when user types
     if (errors[name] || errors.general) {
       setErrors({});
     }
@@ -65,7 +44,6 @@ const Login = ({ onLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Basic validation
     const newErrors = {};
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     if (!formData.password) newErrors.password = 'Password is required';
@@ -75,7 +53,7 @@ const Login = ({ onLogin }) => {
       return;
     }
 
-    loginMutation.mutate(formData);
+    login(formData);
   };
 
   return (
@@ -142,14 +120,14 @@ const Login = ({ onLogin }) => {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
                 size="large"
-                disabled={loginMutation.isLoading}
+                disabled={isLoading}
                 startIcon={
-                  loginMutation.isLoading ? 
+                  isLoading ? 
                   <CircularProgress size={20} /> : 
                   null
                 }
               >
-                {loginMutation.isLoading ? 'Signing In...' : 'Sign In'}
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </Box>
           </CardContent>

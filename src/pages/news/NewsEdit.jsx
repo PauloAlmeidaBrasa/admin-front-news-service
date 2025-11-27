@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
@@ -22,56 +22,51 @@ import {
   Update as UpdateIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
-import { newsAPI } from '../../services/api/api-admin';
+// import { useNews } from '../../context/NewsContext';
+import { useNewsById, useUpdateNews } from "../../hooks/useNews"
+
 
 const NewsEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [formData, setFormData] = React.useState({
-    title: '',
-    excerpt: '',
-    content: '',
-    status: 'draft',
-    published_at: '',
-  });
-  const [errors, setErrors] = React.useState({});
 
-  // Fetch news data
-  const { data: news, isLoading, error } = useQuery({
-    queryKey: ['news', id],
-    queryFn: () => newsAPI.getById(id),
-    enabled: !!id,
+  const { data: news, isLoading, error } = useNewsById(id);
+
+  const [formData, setFormData] = useState({
+    news_ID: '',
+    title: '',
+    subtitle: '',
+    text: '',
+    status: 'draft',
+    created_at: '',
   });
+
 
   // Update form when data is loaded
-  React.useEffect(() => {
-    if (news?.data) {
-      const newsData = news.data;
+  useEffect(() => {
+    let newsData = news?.data?.data?.news
+    if (newsData) {
+
       setFormData({
-        title: newsData.title || '',
-        excerpt: newsData.excerpt || '',
-        content: newsData.content || '',
-        status: newsData.status || 'draft',
-        published_at: newsData.published_at 
-          ? new Date(newsData.published_at).toISOString().slice(0, 16)
+        news_ID: newsData[0].id,
+        title: newsData[0].title || '',
+        subtitle: newsData[0].subtitle || '',
+        text: newsData[0].text || '',
+        status: newsData[0].status || 'draft',
+        created_at: newsData[0].created_at 
+          ? new Date(newsData[0].created_at).toISOString().slice(0, 16)
           : '',
       });
     }
   }, [news]);
 
-  const updateMutation = useMutation({
-    mutationFn: (data) => newsAPI.update(id, data),
+  const updateNews = useUpdateNews({
     onSuccess: () => {
-      navigate('/news');
-    },
-    onError: (error) => {
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-      } else {
-        setErrors({ general: 'Failed to update news article' });
-      }
+      // navigate('/news');
+      // queryClient.invalidateQueries(['news-list']);
     },
   });
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,7 +75,7 @@ const NewsEdit = () => {
       [name]: value
     }));
     // Clear error when user starts typing
-    if (errors[name]) {
+    if (error) {
       setErrors(prev => ({
         ...prev,
         [name]: null
@@ -94,7 +89,7 @@ const NewsEdit = () => {
     // Basic validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.content.trim()) newErrors.content = 'Content is required';
+    if (!formData.text.trim()) newErrors.text = 'Content is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -102,18 +97,29 @@ const NewsEdit = () => {
     }
 
     // Prepare data for API
+    console.log(formData)
     const submitData = {
       ...formData,
-      published_at: formData.published_at || null,
-      _method: 'PUT' // For Laravel form method spoofing if needed
+      created_at: formData.published_at || null,
+      _method: 'PATCH' // For Laravel form method spoofing if needed
     };
 
-    updateMutation.mutate(submitData);
+    updateNews.mutate({
+      id,
+      payload: submitData,
+    });
+
+    // updateNews.mutate(submitData);
+
+
+    // update(submitData)
   };
 
   const handleBack = () => {
     navigate('/news');
   };
+
+   const originalNews = news?.data?.data?.news
 
   if (isLoading) {
     return (
@@ -130,7 +136,7 @@ const NewsEdit = () => {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="error" sx={{ mb: 3 }}>
-          Failed to load news article: {error.message}
+          Failed to load news article: {error}
         </Alert>
         <Button startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Back to News
@@ -139,7 +145,7 @@ const NewsEdit = () => {
     );
   }
 
-  if (!news?.data) {
+  if (!originalNews) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="warning" sx={{ mb: 3 }}>
@@ -152,7 +158,7 @@ const NewsEdit = () => {
     );
   }
 
-  const originalNews = news.data;
+ 
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -192,9 +198,9 @@ const NewsEdit = () => {
       </Box>
 
       {/* Error Alert */}
-      {errors.general && (
+      {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {errors.general}
+          {error.general}
         </Alert>
       )}
 
@@ -203,7 +209,9 @@ const NewsEdit = () => {
         <Grid item xs={12} md={8}>
           <Card>
             <CardContent sx={{ p: 4 }}>
-              <Box component="form" onSubmit={handleSubmit} noValidate>
+              <Box component="form" 
+              // onSubmit={handleSubmit} 
+              noValidate>
                 <Grid container spacing={3}>
                   {/* Title */}
                   <Grid item xs={12}>
@@ -213,23 +221,23 @@ const NewsEdit = () => {
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      error={!!errors.title}
-                      helperText={errors.title}
+                      error={!!error}
+                      helperText={error}
                       required
                       placeholder="Enter a compelling title for your news article"
                     />
                   </Grid>
 
-                  {/* Excerpt */}
+                  {/* TextField */}
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Excerpt"
-                      name="excerpt"
-                      value={formData.excerpt}
+                      label="Sub-title"
+                      name="subtitle"
+                      value={formData.subtitle}
                       onChange={handleChange}
-                      error={!!errors.excerpt}
-                      helperText={errors.excerpt || "Brief summary of the news article (optional)"}
+                      error={!!error}
+                      helperText={error || "Brief summary of the news article (optional)"}
                       multiline
                       rows={3}
                       placeholder="Provide a short summary that will appear in news listings..."
@@ -241,11 +249,11 @@ const NewsEdit = () => {
                     <TextField
                       fullWidth
                       label="Content"
-                      name="content"
-                      value={formData.content}
+                      name="text"
+                      value={formData.text}
                       onChange={handleChange}
-                      error={!!errors.content}
-                      helperText={errors.content}
+                      error={!!error}
+                      helperText={error}
                       required
                       multiline
                       rows={12}
@@ -287,10 +295,11 @@ const NewsEdit = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    type="datetime-local"
+                    type="datetime"
                     label="Publish Date & Time"
-                    name="published_at"
-                    value={formData.published_at}
+                    name="created_at"
+                    value={formData.created_at}
+                    // value={formatDate(formData.published_at)}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
                     helperText="Schedule publication for a specific date and time"
@@ -306,14 +315,14 @@ const NewsEdit = () => {
                       size="large"
                       fullWidth
                       onClick={handleSubmit}
-                      disabled={updateMutation.isLoading}
+                      disabled={isLoading}
                       startIcon={
-                        updateMutation.isLoading ? 
+                        isLoading ? 
                         <CircularProgress size={20} /> : 
                         <SaveIcon />
                       }
                     >
-                      {updateMutation.isLoading ? 'Updating...' : 'Update News'}
+                      {isLoading ? 'Updating...' : 'Update News'}
                     </Button>
                     
                     <Button
@@ -321,7 +330,7 @@ const NewsEdit = () => {
                       size="large"
                       fullWidth
                       onClick={handleBack}
-                      disabled={updateMutation.isLoading}
+                      disabled={isLoading}
                     >
                       Cancel
                     </Button>
@@ -361,7 +370,7 @@ const NewsEdit = () => {
                   </Typography>
                 </Box>
 
-                {originalNews.published_at && (
+                {originalNews.created_at && (
                   <>
                     <Divider />
                     <Box>
@@ -369,7 +378,7 @@ const NewsEdit = () => {
                         Originally Published
                       </Typography>
                       <Typography variant="body2">
-                        {new Date(originalNews.published_at).toLocaleString()}
+                        {new Date(originalNews.created_at).toLocaleString()}
                       </Typography>
                     </Box>
                   </>

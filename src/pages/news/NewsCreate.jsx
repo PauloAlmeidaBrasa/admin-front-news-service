@@ -81,7 +81,7 @@ const NewsCreate = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.text.trim()) newErrors.content = 'Content is required';
-    if (!formData.category) newErrors.category = 'Content is required';
+    if (!formData.category) newErrors.category = 'category is required';
 
     console.log(newErrors)
     if (Object.keys(newErrors).length > 0) {
@@ -157,7 +157,7 @@ const NewsCreate = () => {
                       fullWidth
                       label="Sub-title"
                       name="subtitle"
-                      value={formData.excerpt}
+                      value={formData.subtitle}
                       onChange={handleChange}
                       error={!!errors.excerpt}
                       helperText={errors.excerpt || "Brief summary of the news article (optional)"}
@@ -222,6 +222,8 @@ const NewsCreate = () => {
                     value={formData.category}
                     onChange={handleChangeCategory}
                     helperText="Select a category"
+                    required
+                    error={!!errors.content}
                     disabled={categoriesLoading}
                   >
                     {categoriesLoading ? (

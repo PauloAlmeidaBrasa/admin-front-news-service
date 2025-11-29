@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Edit, Trash2, Search } from 'lucide-react'
-import { useCategoryList } from '../../hooks/useCategory'
+import { useCategoryList,useDeleteCategory } from '../../hooks/useCategory'
 import { formatDate } from '../util/utilPages'
 
 
@@ -10,11 +10,11 @@ const CategoryList =  () => {
   const [searchTerm, setSearchTerm] = useState('')
   const { data: categories, isLoading } = useCategoryList()
 
-//   const deleteNews = useDeleteNews();
+  const deleteNews = useDeleteCategory();
 
-  const handleDelete = (newsId) => {
-    if (confirm("Are you sure you want to delete this news?")) {
-    //   deleteNews.mutate(newsId);
+  const handleDelete = (categoryId) => {
+    if (confirm("Are you sure you want to delete this category?")) {
+      deleteNews.mutate(categoryId);
     }
   };
 

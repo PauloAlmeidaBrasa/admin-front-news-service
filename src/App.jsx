@@ -11,6 +11,7 @@ import Login from './pages/login/Login';
 import CategoryList from './pages/category/CategoryList';
 import { useLocation } from 'react-router-dom';
 import CategoryEdit from './pages/category/CategoryEdit'
+import CategoryCreate from './pages/category/CategoryCreate';
 
 const theme = createTheme({
   palette: {
@@ -51,6 +52,7 @@ function App() {
             <Route path="/news/edit/:id" element={<Layout><NewsEdit /></Layout>} />
             <Route path="/category" element={<Layout><CategoryList /></Layout>} />
             <Route path="/category/edit/:id" element={<Layout><CategoryEdit /></Layout>} />
+            <Route path="/category/add-category" element={<Layout><CategoryCreate /></Layout>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

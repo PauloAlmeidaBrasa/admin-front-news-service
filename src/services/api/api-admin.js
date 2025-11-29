@@ -131,12 +131,11 @@ export const newsAPICategory = {
       params: {category_ID: payload}
     })
   },
-  add: (data) =>api.post(getApiUrl('category/add-news'), data),
+  add: (data) =>api.post(getApiUrl('category/add-category'), data),
   update: async (payload) => {
     return api.patch(getApiUrl(`category/update/${payload.id}`), payload.payload)
   },
-  // update: (id, data) => api.patch(`/api/news/${id}`, data),
-  // delete: (id) => api.delete(`/api/news/${id}`),
+  delete: (id) => api.post(getApiUrl('category/delete'),{category_ID: id}),
 };
 
 export default api;

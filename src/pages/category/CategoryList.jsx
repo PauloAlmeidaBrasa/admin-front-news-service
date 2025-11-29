@@ -48,7 +48,7 @@ const CategoryList =  () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Category Management</h1>
         <Link
-          to="/news/create"
+          to="/category/add-category"
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Create Category

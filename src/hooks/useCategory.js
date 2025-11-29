@@ -41,10 +41,25 @@ export function useDeleteCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id) => newsAPINews.delete(id),
+    mutationFn: (id) => newsAPICategory.delete(id),
     onSuccess: () => {
       // Refresh the table after deletion
       queryClient.invalidateQueries(['category-list']);
     },
   });
 }
+
+export const useAddCategory = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload) => newsAPICategory.add(payload),
+    // mutationKey: ['']
+    onSuccess: (...args) => {
+      if (options.onSuccess) {
+        options.onSuccess(...args);
+      }
+      queryClient.invalidateQueries(['category-list']);
+    },
+  });
+};

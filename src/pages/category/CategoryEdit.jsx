@@ -140,7 +140,7 @@ console.log(category)
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Alert severity="warning" sx={{ mb: 3 }}>
-          News Categoty not found
+          News Category not found
         </Alert>
         <Button startIcon={<ArrowBackIcon />} onClick={handleBack}>
           Back to category

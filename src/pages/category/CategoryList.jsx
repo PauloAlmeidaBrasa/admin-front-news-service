@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Edit, Trash2, Search } from 'lucide-react'
 import { useCategoryList } from '../../hooks/useCategory'
+import { formatDate } from '../util/utilPages'
 
 
 const CategoryList =  () => {
@@ -45,7 +46,7 @@ const CategoryList =  () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">News Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Category Management</h1>
         <Link
           to="/news/create"
           className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
@@ -60,7 +61,7 @@ const CategoryList =  () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
           <input
             type="text"
-            placeholder="Search news..."
+            placeholder="Search category..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -79,9 +80,9 @@ const CategoryList =  () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Description
               </th>
-              {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                content
-              </th> */}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Created Date
+              </th>
               {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date Created
               </th> */}
@@ -99,12 +100,12 @@ const CategoryList =  () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{item.description}</div>
                 </td>
-                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatDate(item.created_at)}
-                </td> */}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <Link
-                    to={`/category/get-category/${item.id}`}
+                    to={`/category/edit/${item.id}`}
                     className="text-blue-600 hover:text-blue-900"
                   >
                     <Edit className="h-4 w-4 inline" />

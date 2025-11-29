@@ -25,7 +25,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
 
   const { mutate: login, isLoading, isError, error } = useLogin({
-    onSuccess: (data) => {
+    onSuccess: () => {
       navigate('/news')
     }
   });

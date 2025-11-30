@@ -8,9 +8,10 @@ import NewsList from './pages/news/NewsList';
 import NewsCreate from './pages/news/NewsCreate';
 import NewsEdit from './pages/news/NewsEdit';
 import Login from './pages/login/Login';
-
-import { CategoryProvider } from './context/_CategoryContext';
+import CategoryList from './pages/category/CategoryList';
 import { useLocation } from 'react-router-dom';
+import CategoryEdit from './pages/category/CategoryEdit'
+import CategoryCreate from './pages/category/CategoryCreate';
 
 const theme = createTheme({
   palette: {
@@ -49,6 +50,9 @@ function App() {
             <Route path="/news" element={<Layout><NewsList /></Layout>} />
             <Route path="/news/create" element={<Layout><NewsCreate /></Layout>} />
             <Route path="/news/edit/:id" element={<Layout><NewsEdit /></Layout>} />
+            <Route path="/category" element={<Layout><CategoryList /></Layout>} />
+            <Route path="/category/edit/:id" element={<Layout><CategoryEdit /></Layout>} />
+            <Route path="/category/add-category" element={<Layout><CategoryCreate /></Layout>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

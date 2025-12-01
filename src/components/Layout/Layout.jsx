@@ -61,6 +61,7 @@ const Layout = ({ children }) => {
     { text: 'News', icon: <NewsIcon />, path: '/news' },
     { text: 'Create News', icon: <AddIcon />, path: '/news/create' },
     { text: 'Category', icon: <AddIcon />, path: '/category' },
+    { text: 'Users', icon: <AddIcon />, path: '/user' },
   ];
 
   return (

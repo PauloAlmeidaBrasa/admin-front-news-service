@@ -11,7 +11,11 @@ import Login from './pages/login/Login';
 import CategoryList from './pages/category/CategoryList';
 import { useLocation } from 'react-router-dom';
 import CategoryEdit from './pages/category/CategoryEdit'
-import CategoryCreate from './pages/category/CategoryCreate';
+import CategoryCreate from './pages/category/CategoryCreate'
+import UserCreate from './pages/user/UserCreate'
+import UserList from './pages/user/UserList';
+import UserEdit from './pages/user/UserEdit';
+
 
 const theme = createTheme({
   palette: {
@@ -53,6 +57,9 @@ function App() {
             <Route path="/category" element={<Layout><CategoryList /></Layout>} />
             <Route path="/category/edit/:id" element={<Layout><CategoryEdit /></Layout>} />
             <Route path="/category/add-category" element={<Layout><CategoryCreate /></Layout>} />
+            <Route path="/user" element={<Layout><UserList /></Layout>} />
+            <Route path="/user/create" element={<Layout><UserCreate /></Layout>} />
+            <Route path="/user/edit/:id" element={<Layout><UserEdit /></Layout>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

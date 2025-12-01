@@ -95,17 +95,27 @@ export const newsAPIAuth = {
   },
 };
 
-
 export const newsAPI = {
-  // getLogin: () => api.post(getApiUrl('login')),
-  // getLogin: (credentials) => {
-  //   api.create({withCredentials: true})
-  //   api.post(getApiUrl('login'),credentials)
-  // },
-  // getById: (id) => api.get(`/api/news/${id}`),
-  // create: (data) => api.post('/api/news', data),
-  // update: (id, data) => api.patch(`/api/news/${id}`, data),
-  // delete: (id) => api.delete(`/api/news/${id}`),
+  add: (data) =>api.post(getApiUrl('user/add-user'), data),
+};
+
+
+export const newsAPIUser = {
+  getAll: async () => {
+    return api.get(getApiUrl('user/get-users')) 
+  },
+  getById: async (userId) => {
+    return api.get(getApiUrl('user/get-users'), {
+      params: { user_ID: userId }
+    })
+  },
+  update: async (params) => {
+    return api.patch(getApiUrl('user/update'), params.payload)
+  },
+  add: (data) => {
+    api.post(getApiUrl('user/add-user'), data)
+  },
+  delete: (id) => api.post(getApiUrl('user/delete'),{user_ID: id}),
 };
 
 

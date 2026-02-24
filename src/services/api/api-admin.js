@@ -88,7 +88,7 @@ api.interceptors.response.use(
 
 export const newsAPIAuth = {
   getLogin: async (credentials) => {
-    return  api.post(getApiUrl('login'),credentials,{withCredentials:true}).then((res) => {
+    return  api.post(getApiUrl('authentication'),credentials,{withCredentials:true}).then((res) => {
 
       return res.data;
     })
@@ -121,12 +121,10 @@ export const newsAPIUser = {
 
 export const newsAPINews = {
   getAll: async () => {
-    return api.get(getApiUrl('news/get-news')) 
+    return api.get(getApiUrl('news')) 
   },
   getById: async (newsId) => {
-    return api.get(getApiUrl('news/get-news'), {
-      params: { news_ID: newsId }
-    })
+    return api.get(getApiUrl(`news/${newsId}`))
   },
   add: (data) =>api.post(getApiUrl('news/add-news'), data),
   update: async (id,data) => {
@@ -135,7 +133,7 @@ export const newsAPINews = {
   delete: (id) => api.post(getApiUrl('news/delete'),{news_ID: id}),
 };
 export const newsAPICategory = {
-  getAll: () => api.get(getApiUrl('category/get-category')),
+  getAll: () => api.get(getApiUrl('categories')),
   getById: (payload) => {
     return api.get(getApiUrl('category/get-category'), {
       params: {category_ID: payload}

@@ -27,7 +27,7 @@ const NewsCreate = () => {
 
   // const { categories, isLoading } = useCategory();
 
-  const { data: categories } = useCategoryList();
+  const { data: catResult } = useCategoryList();
 
 
   const navigate = useNavigate();
@@ -35,9 +35,9 @@ const NewsCreate = () => {
     title: '',
     subtitle: '',
     text: '',
-    status: 'draft',
-    published_at: '',
-    category: ''
+    // status: 'draft',
+    created_at: '',
+    category_id: '',
   });
   const [errors, setErrors] = React.useState({});
 
@@ -50,20 +50,7 @@ const NewsCreate = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: null
-      }));
-    }
-  };
-  const handleChangeCategory = (e) => {
-    const { name, value } = e.target;
+    console.log(name, value)
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -84,11 +71,9 @@ const NewsCreate = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.text.trim()) newErrors.content = 'Content is required';
-    if (!formData.category) newErrors.category = 'category is required';
+    if (!formData.category_id) newErrors.category = 'category is required';
 
-    console.log(newErrors)
     if (Object.keys(newErrors).length > 0) {
-      console.log('ljkdla')
       setErrors(newErrors);
       return;
     }
@@ -96,9 +81,10 @@ const NewsCreate = () => {
     // Prepare data for API
     const submitData = {
       ...formData,
-      published_at: formData.published_at || null,
+      created_at: formData.created_at || null,
     };
 
+    console.log(submitData)
     addNews(submitData);
   };
 
@@ -221,19 +207,18 @@ const NewsCreate = () => {
                     fullWidth
                     select
                     label="Category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChangeCategory}
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleChange}
                     helperText={errors.category || "Select a category"}
                     required
                     error={!!errors.category}
                     disabled={isLoading}
                   >
-                    {console.log(categories)}
                     {isLoading ? (
                       <MenuItem disabled>Loading...</MenuItem>
                     ) : (
-                      categories?.data?.category.map(cat => (
+                      catResult?.category.map(cat => (
                         <MenuItem key={cat.id} value={cat.id}>
                           {cat.name}
                         </MenuItem>
@@ -248,8 +233,8 @@ const NewsCreate = () => {
                     fullWidth
                     type="datetime-local"
                     label="Publish Date & Time"
-                    name="published_at"
-                    value={formData.published_at}
+                    name="created_at"
+                    value={formData.created_at}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
                     helperText="Schedule publication for a specific date and time"

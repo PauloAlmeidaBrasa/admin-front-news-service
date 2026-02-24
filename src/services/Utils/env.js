@@ -7,7 +7,7 @@ export const getApiUrl = (endpoint = '') => {
   const backendUrl = getEnv('VITE_API_BACKEND_BASE');
   const backendVersion = getEnv('VITE_API_BACKEND_VERSION');
 //  console.log(getEnv('VITE_API_BACKEND_BASE'))
-  return `${backendUrl}/api/${backendVersion}/${endpoint}`;
+  return `${backendUrl}/${backendVersion}/${endpoint}`;
 };
 
 export const getWebsocketUrl = () => {

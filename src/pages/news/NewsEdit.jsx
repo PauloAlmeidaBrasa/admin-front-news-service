@@ -32,7 +32,6 @@ const NewsEdit = () => {
   const { data: news, isLoading, error } = useNewsById(id);
 
   const [formData, setFormData] = useState({
-    news_ID: '',
     title: '',
     subtitle: '',
     text: '',
@@ -43,17 +42,17 @@ const NewsEdit = () => {
 
   // Update form when data is loaded
   useEffect(() => {
-    let newsData = news?.data?.data?.news
+    let newsData = news?.data?.news
+    console.log('News data:', newsData)
     if (newsData) {
-
       setFormData({
-        news_ID: newsData[0].id,
-        title: newsData[0].title || '',
-        subtitle: newsData[0].subtitle || '',
-        text: newsData[0].text || '',
-        status: newsData[0].status || 'draft',
-        created_at: newsData[0].created_at 
-          ? new Date(newsData[0].created_at).toISOString().slice(0, 16)
+        // news_ID: newsData.id,
+        title: newsData.title || '',
+        subtitle: newsData.subtitle || '',
+        text: newsData.text || '',
+        // status: newsData.status || 'draft',
+        created_at: newsData.created_at 
+          ? new Date(newsData.created_at).toISOString().slice(0, 16)
           : '',
       });
     }
@@ -98,8 +97,7 @@ const NewsEdit = () => {
     console.log(formData)
     const submitData = {
       ...formData,
-      created_at: formData.published_at || null,
-      _method: 'PATCH' // For Laravel form method spoofing if needed
+      created_at: formData.created_at || null,
     };
 
     updateNews.mutate({
@@ -117,7 +115,7 @@ const NewsEdit = () => {
     navigate('/news');
   };
 
-   const originalNews = news?.data?.data?.news
+   const originalNews = news?.data?.news
 
   if (isLoading) {
     return (

@@ -24,7 +24,7 @@ const theme = createTheme({
   },
 });
 
-function App() { 
+function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(null);
 
   const location = useLocation();
@@ -53,7 +53,7 @@ function App() {
             <Route path="/" element={<Layout><Dashboard /></Layout>} />
             <Route path="/news" element={<Layout><NewsList /></Layout>} />
             <Route path="/news/create" element={<Layout><NewsCreate /></Layout>} />
-            <Route path="/news/edit/:id" element={<Layout><NewsEdit /></Layout>} />
+            <Route path="/news/:id" element={<Layout><NewsEdit /></Layout>} />
             <Route path="/category" element={<Layout><CategoryList /></Layout>} />
             <Route path="/category/edit/:id" element={<Layout><CategoryEdit /></Layout>} />
             <Route path="/category/add-category" element={<Layout><CategoryCreate /></Layout>} />

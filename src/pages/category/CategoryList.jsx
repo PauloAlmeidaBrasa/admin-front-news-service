@@ -19,7 +19,7 @@ const CategoryList =  () => {
   };
 
 
-  let amountCategory = categories?.data?.category
+  let amountCategory = categories?.category
   let filteredNews = []
    console.log(amountCategory)
 
